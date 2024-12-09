@@ -167,7 +167,7 @@ class Chart(DotDict):
                     radius=radius,
                     start_deg=start_deg,
                     end_deg=end_deg,
-                    fill=self.bg_colors[i],
+                    fill=self.config.theme.signWheel,
                     stroke_color=self.config.theme.foreground,
                     stroke_width=self.config.chart.stroke_width,
                 )
@@ -196,12 +196,11 @@ class Chart(DotDict):
                             cy=10,
                             r=12,
                             stroke="none",
-                            # fill="red",
-                            fill=self.bg_colors[i],
+                            fill=self.config.theme.signWheel,  # Sign background color
                         ),
                         svg_paths[SIGN_MEMBERS[i].name],
                     ],
-                    stroke=self.config.theme[SIGN_MEMBERS[i].color],
+                    stroke=self.config.theme.labels,
                     stroke_width=self.config.chart.stroke_width * 1.5,
                     fill="none",
                     transform=f"translate({symbol_x}, {symbol_y}) scale({self.scale_adjustment})",
@@ -220,15 +219,15 @@ class Chart(DotDict):
 
         for i, (start_deg, end_deg) in enumerate(self.house_vertices):
             wheel.append(
-                self.sector(
-                    radius=radius,
-                    start_deg=start_deg,
-                    end_deg=end_deg,
-                    fill=self.bg_colors[i],
-                    stroke_color=self.config.theme.foreground,
-                    stroke_width=self.config.chart.stroke_width,
+                    self.sector(
+                        radius=radius,
+                        start_deg=start_deg,
+                        end_deg=end_deg,
+                        fill=self.config.theme.houses,  # House fill color
+                        stroke_color=self.config.theme.foreground,
+                        stroke_width=self.config.chart.stroke_width,
+                    )
                 )
-            )
 
             # Add house number
             number_width = self.font_size * 0.8
@@ -239,16 +238,16 @@ class Chart(DotDict):
             number_x = self.cx - number_radius * cos(number_angle)
             number_y = self.cy + number_radius * sin(number_angle)
             wheel.append(
-                text(
-                    str(i + 1),  # House numbers start from 1
-                    x=number_x,
-                    y=number_y,
-                    fill=getattr(self.config.theme, SIGN_MEMBERS[i].color),
-                    font_size=number_width,
-                    text_anchor="middle",
-                    dominant_baseline="central",
-                )
+            text(
+                str(i + 1),
+                x=number_x,
+                y=number_y,
+                fill=self.config.theme.labels,  # Label color
+                font_size=number_width,
+                text_anchor="middle",
+                dominant_baseline="central",
             )
+)
 
         return wheel
 
@@ -281,10 +280,6 @@ class Chart(DotDict):
             stroke_width = self.config.chart.stroke_width
             stroke_color = self.config.theme.dim
 
-            if house.value in [1, 4, 7, 10]:
-                radius = vertex_radius
-                stroke_color = self.config.theme.foreground
-
             angle = radians(house.normalized_degree)
             end_x = self.cx - radius * cos(angle)
             end_y = self.cy + radius * sin(angle)
@@ -295,7 +290,7 @@ class Chart(DotDict):
                     y1=self.cy,
                     x2=end_x,
                     y2=end_y,
-                    stroke=stroke_color,
+                    stroke=self.config.theme.foreground,
                     stroke_width=stroke_width,
                     stroke_opacity=self.config.chart.stroke_opacity,
                 )
@@ -487,13 +482,13 @@ class Chart(DotDict):
         for body, adj_deg in zip(sorted_norm_bodies, adj_norm_degs):
             g_opt = {
                 "fill": "none",
-                "stroke": self.config.theme[body.color],
+                "stroke": self.config.theme.labels,
                 "stroke_width": self.config.chart.stroke_width * 1.5,
             }
 
             # special handling for asc, ic, dsc and mc
             if body.name in VERTEX_NAMES:
-                g_opt["fill"] = self.config.theme[body.color]
+                g_opt["fill"] = self.config.theme.labels
                 g_opt["stroke"] = "none"
 
             symbol_radius = wheel_radius + (self.ring_thickness / 2)
@@ -520,7 +515,7 @@ class Chart(DotDict):
                         y1=degree_y,
                         x2=symbol_x,
                         y2=symbol_y,
-                        stroke=self.config.theme[body.color],
+                        stroke=self.config.theme.labels,
                         stroke_width=self.config.chart.stroke_width / 2,
                     ),
                     circle(
@@ -562,7 +557,7 @@ class Chart(DotDict):
         bg = [
             self.background(
                 radius,
-                fill=self.config.theme.background,
+                fill=self.config.theme.aspectBackground,
                 stroke=self.config.theme.dim,
                 stroke_width=self.config.chart.stroke_width,
             )
@@ -574,7 +569,7 @@ class Chart(DotDict):
         # Define the inner circle radius
         inner_radius = radius - self.ring_thickness
 
-        # Iterate through each aspect to draw the lines
+        # Iterate through each aspect to draw the aspect lines
         for aspect in aspects:
             # Starting and ending angles for the aspect
             start_angle = radians(self.data1.normalize(aspect.body1.degree))
@@ -608,7 +603,7 @@ class Chart(DotDict):
                     y1=self.cy + radius * sin(start_angle),
                     x2=spike_x1,
                     y2=spike_y1,
-                    stroke=self.config.theme.dim,
+                    stroke=self.config.theme.labels,
                     stroke_width=self.config.chart.stroke_width,
                 ),
                 line(
@@ -616,7 +611,7 @@ class Chart(DotDict):
                     y1=self.cy + radius * sin(end_angle),
                     x2=spike_x2,
                     y2=spike_y2,
-                    stroke=self.config.theme.dim,
+                    stroke=self.config.theme.labels,
                     stroke_width=self.config.chart.stroke_width,
                 ),
             ])
@@ -630,27 +625,31 @@ class Chart(DotDict):
                         y1=spike_y1,
                         x2=spike_x2,
                         y2=spike_y2,
-                        stroke=self.config.theme[aspect.aspect_member.color],
-                        stroke_width=self.config.chart.stroke_width * self.config.chart.conjunction_line_multiple,  # Thicker line
+                        stroke=self.config.theme.conjunction,
+                        stroke_width=self.config.chart.stroke_width * self.config.chart.conjunction_line_multiple,
                         stroke_opacity=self.config.chart.stroke_opacity,
                     )
                 )
             else:
                 # Regular aspect line
+                try:
+                    _stroke = getattr(self.config.theme, aspect.aspect_member.name)
+                except:
+                    _stroke = self.config.theme.other_aspects
                 aspect_lines.append(
                     line(
                         x1=spike_x1,
                         y1=spike_y1,
                         x2=spike_x2,
                         y2=spike_y2,
-                        stroke=self.config.theme[aspect.aspect_member.color],
-                        stroke_width=self.config.chart.stroke_width*self.config.chart.aspect_line_ratio,
+                        stroke=_stroke,
+                        stroke_width=self.config.chart.stroke_width * self.config.chart.aspect_line_ratio,
                         stroke_opacity=self.config.chart.stroke_opacity * opacity_factor,
                     )
                 )
 
         self.aspect_lines_len = len(aspect_lines)  # For testing only
-        return bg + spike_lines + aspect_lines
+        return bg + aspect_lines + spike_lines
 
 
     @cached_property
@@ -674,15 +673,10 @@ class Chart(DotDict):
 
     @cached_property
     def bg_colors(self) -> list[str]:
-        """Get the background colors for each house.
-
-        Returns:
-            A list of hex color strings for house backgrounds
-        """
-
+        """Get the blended background colors for each house."""
         def hex_to_rgb(hex_value):
             hex_value = hex_value.lstrip("#")
-            return tuple(int(hex_value[i : i + 2], 16) for i in (0, 2, 4))
+            return tuple(int(hex_value[i:i+2], 16) for i in (0, 2, 4))
 
         def rgb_to_hex(rgb):
             return "#" + "".join(f"{i:02x}" for i in rgb)
@@ -690,12 +684,12 @@ class Chart(DotDict):
         trans = self.config.theme.transparency
         output = []
         for i in range(4):
-            hex_color = getattr(self.config.theme, SIGN_MEMBERS[i].color)
+            hex_color = self.config.theme.houses  # House base color
             rgb_color = hex_to_rgb(hex_color)
-            rgb_bg = hex_to_rgb(self.config.theme.background)
-            # blend the color with the background
+            rgb_bg = hex_to_rgb(self.config.theme.background)  # Background color
+            # Blend the color with the background
             blended_rgb = tuple(
-                int(trans * rgb_color[i] + (1 - trans) * rgb_bg[i]) for i in range(3)
+                int(trans * rgb_color[j] + (1 - trans) * rgb_bg[j]) for j in range(3)
             )
             output.append(rgb_to_hex(blended_rgb))
 

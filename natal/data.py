@@ -175,8 +175,6 @@ class Data(DotDict):
         for v in self.vertices:
             setattr(self, v.name, v)
 
-
-
     def set_aspectable(self) -> None:
         """Set the aspectable celestial bodies based on the display configuration."""
         self.aspectables = [
@@ -234,7 +232,7 @@ class Data(DotDict):
         """Get string representation of the Data object.
 
         Returns:
-            str: Formatted string showing chart data
+            str: Formatted string showing chart data.
         """
         op = ""
         op += f"Name: {self.name}\n"
@@ -256,10 +254,10 @@ class Data(DotDict):
             op += f"{e.name}: {e.signed_dms}\n"
         op += "Signs:\n"
         for e in self.signs:
-            op += f"{e.name}: degree={e.degree:.2f}, ruler={e.ruler}, color={e.color}, modality={e.modality}, element={e.element}, polarity={e.polarity}\n"
+            op += f"{e.name}: degree={e.degree:.2f}, ruler={e.ruler}, modality={e.modality}, element={e.element}, polarity={e.polarity}\n"
         op += "Aspects:\n"
         for e in self.aspects:
-            op += f"{e.body1.name} {e.aspect_member.symbol} {e.body2.name}: {e.aspect_member.color}\n"
+            op += f"{e.body1.name} {e.aspect_member.symbol} {e.body2.name}\n"
         return op
 
     # utils ===============================
