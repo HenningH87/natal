@@ -158,7 +158,7 @@ class Config(ModelDict):
     """
 
     zodiac: ZodiacCalculation = ZodiacCalculation.TROPICAL
-    house_sys: HouseSys = HouseSys.Placidus
+    house_sys: HouseSys = HouseSys.Whole_Sign
     orb: Orb = Orb()
     theme: Theme = Theme()
     display: Display = Display()
