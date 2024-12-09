@@ -14,7 +14,6 @@ class Body(DotDict):
     name: str
     symbol: str
     value: int
-    color: str
 
 
 class PlanetMember(Body):
@@ -152,42 +151,36 @@ PLANETS = dict(
     name=PLANET_NAMES,
     symbol="☉☽☿♀♂♃♄♅♆♇",
     value=list(range(10)),
-    color="fire water air earth fire fire earth air water water".split(),
 )
 
 ASPECTS = dict(
     name=ASPECT_NAMES,
     symbol="☌☍△□⚹⚻",
     value=[0, 180, 120, 90, 60, 150],
-    color=["others", "water", "air", "fire", "points", "asteroids"],
 )
 
 ELEMENTS = dict(
     name=ELEMENT_NAMES,
     symbol="🜂🜃🜁🜄",
     value=[0, 1, 2, 3],
-    color=["fire", "earth", "air", "water"],
 )
 
 MODALITY = dict(
     name=MODALITY_NAMES,
     symbol="⟑⊟𛰣",
     value=[0, 1, 2],
-    color=["fire", "earth", "air"],
 )
 
 POLARITY = dict(
     name=POLARITY_NAMES,
     symbol=["+", "-"],
     value=[1, -1],
-    color=["positive", "negative"],
 )
 
 SIGNS = dict(
     name=SIGN_NAMES,
     symbol="♈♉♊♋♌♍♎♏♐♑♒♓",
     value=list(range(1, 13)),
-    color=["fire", "earth", "air", "water"] * 3,
     ruler="mars venus mercury moon sun mercury venus pluto jupiter saturn uranus neptune".split(),
     detriment="venus pluto jupiter saturn uranus neptune mars venus mercury moon sun mercury".split(),
     exaltation=[
@@ -229,21 +222,18 @@ HOUSES = dict(
     name=HOUSE_NAMES,
     symbol=[str(i) for i in range(1, 13)],
     value=list(range(1, 13)),
-    color=["fire", "earth", "air", "water"] * 3,
 )
 
 EXTRAS = dict(
     name=EXTRA_NAMES,
     symbol="☊⚷⚳⚴⚵⚶",
     value=[10, 15, 17, 18, 19, 20],
-    color=["points"] + ["asteroids"] * 5,
 )
 
 VERTICES = dict(
     name=VERTEX_NAMES,
     symbol=["Asc", "IC", "Dsc", "MC"],
     value=[1, 4, 7, 10],
-    color=["fire", "water", "air", "earth"],
 )
 
 # Derived Members =================================

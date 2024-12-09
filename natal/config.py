@@ -78,48 +78,29 @@ class Orb(ModelDict):
     opposition: int = 9
     trine: int = 6
     square: int = 6
-    sextile: int = 5
+    sextile: int = 0
     quincunx: int = 0
 
 
 class Theme(ModelDict):
     """
-    Default colors for the chart.
+    Default colors for the chart in black and white with aspects in color.
     """
-
-    fire: str = "#ef476f"  # fire, square, Asc
-    earth: str = "#ffd166"  # earth, MC
-    air: str = "#06d6a0"  # air, trine
-    water: str = "#81bce7"  # water, opposition
-    points: str = "#118ab2"  # lunar nodes, sextile
-    asteroids: str = "#AA96DA"  # asteroids, quincunx
-    positive: str = "#FFC0CB"  # positive
-    negative: str = "#AD8B73"  # negative
-    others: str = "#FFA500"  # conjunction
-    transparency: float = 0.1
-    foreground: str
-    background: str
-    dim: str
-
-
-class LightTheme(Theme):
-    """
-    Default light colors.
-    """
-
-    foreground: str = "#758492"
-    background: str = "#FFFDF1"
+    opposition: str = "#005AB5"
+    square: str = "#DC3220"
+    trine: str = "#009E73"
+    conjunction: str = "#F0E442"
+    other_aspects: str = "#a3a2a2"
+    houses: str = "#FFFFFF"
+    labels: str = "#000000" 
+    sign_labels: str = "#000000"
+    degree_labels: str = "#000000"
+    transparency: float = 0
+    foreground: str = "#758492" # The colors for the lines
+    background: str = "#FFFFFF"
+    signWheel: str = "#FFFFFF"
     dim: str = "#A4BACD"
-
-
-class DarkTheme(Theme):
-    """
-    Default dark colors.
-    """
-
-    foreground: str = "#F7F3F0"
-    background: str = "#343a40"
-    dim: str = "#515860"
+    aspectBackground: str = "#FFFFFF"
 
 
 class Display(ModelDict):
@@ -163,9 +144,9 @@ class Chart(ModelDict):
     margin_factor: float = 0.04
     ring_thickness_fraction: float = 0.15
     spike_length_ratio: float = 0.15
-    conjunction_line_multiple: float = 3
+    conjunction_line_multiple: float = 5
     aspect_line_ratio: float = 0.75
-    horizon_line: bool = False
+    horizon_line: bool = True
     # hard-coded 2.2 and 600 due to the original symbol svg size = 20x20
     scale_adj_factor: float = 600
     pos_adj_factor: float = 2.2
@@ -176,30 +157,9 @@ class Config(ModelDict):
     Package configuration model.
     """
 
-    theme_type: ThemeType = "dark"
     zodiac: ZodiacCalculation = ZodiacCalculation.TROPICAL
     house_sys: HouseSys = HouseSys.Placidus
     orb: Orb = Orb()
-    light_theme: LightTheme = LightTheme()
-    dark_theme: DarkTheme = DarkTheme()
+    theme: Theme = Theme()
     display: Display = Display()
     chart: Chart = Chart()
-
-    @property
-    def theme(self) -> Theme:
-        """
-        Return theme colors based on the theme type.
-
-        Returns:
-            Theme: The theme colors.
-        """
-        match self.theme_type:
-            case "light":
-                return self.light_theme
-            case "dark":
-                return self.dark_theme
-            case "mono":
-                kwargs = {key: "#242424" for key in self.light_theme.model_dump()}
-                kwargs["background"] = "#FFFFFF"
-                kwargs["transparency"] = 0
-                return Theme(**kwargs)
