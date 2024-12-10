@@ -99,7 +99,7 @@ class Theme(ModelDict):
     foreground: str = "#758492" # The colors for the lines
     background: str = "#FFFFFF"
     signWheel: str = "#FFFFFF"
-    dim: str = "#A4BACD"
+    horizon_color: str = "#A4BACD"
     aspectBackground: str = "#FFFFFF"
 
 
@@ -139,8 +139,8 @@ class Chart(ModelDict):
     stroke_opacity: float = 1
     font: str = "sans-serif"
     font_size_fraction: float = 0.55
-    inner_min_degree: float = 9
-    outer_min_degree: float = 8
+    inner_min_degree: float = 7
+    outer_min_degree: float = 6
     margin_factor: float = 0.04
     ring_thickness_fraction: float = 0.15
     spike_length_ratio: float = 0.15
@@ -148,8 +148,8 @@ class Chart(ModelDict):
     aspect_line_ratio: float = 0.75
     horizon_line: bool = True
     # hard-coded 2.2 and 600 due to the original symbol svg size = 20x20
-    scale_adj_factor: float = 600
-    pos_adj_factor: float = 2.2
+    scale_adj_factor: float = 900
+    pos_adj_factor: float = 3.5
 
 
 class Config(ModelDict):

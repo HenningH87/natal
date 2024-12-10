@@ -184,7 +184,7 @@ class Chart(DotDict):
         wheel = []
         for i in range(12):
             start_deg = self.data1.signs[i].normalized_degree
-            symbol_radius = self.max_radius - (self.ring_thickness / 2)
+            symbol_radius = self.max_radius - (self.ring_thickness / 4)
             symbol_angle = radians(start_deg + 15)  # Center of the sector
             symbol_x = self.cx - symbol_radius * cos(symbol_angle) - self.pos_adjustment
             symbol_y = self.cy + symbol_radius * sin(symbol_angle) - self.pos_adjustment
@@ -196,7 +196,7 @@ class Chart(DotDict):
                             cy=10,
                             r=12,
                             stroke="none",
-                            fill=self.config.theme.signWheel,  # Sign background color
+                            fill="none",  # Sign background color
                         ),
                         svg_paths[SIGN_MEMBERS[i].name],
                     ],
@@ -214,7 +214,7 @@ class Chart(DotDict):
         Returns:
             A list of SVG elements representing the house wheel
         """
-        radius = self.max_radius - self.ring_thickness
+        radius = self.max_radius - self.ring_thickness/2
         wheel = [self.background(radius, fill=self.config.theme.background)]
 
         for i, (start_deg, end_deg) in enumerate(self.house_vertices):
@@ -230,8 +230,8 @@ class Chart(DotDict):
                 )
 
             # Add house number
-            number_width = self.font_size * 0.8
-            number_radius = radius - (self.ring_thickness / 2)
+            number_width = self.font_size * 0.4
+            number_radius = radius - (self.ring_thickness / 4)
             number_angle = radians(
                 start_deg + ((end_deg - start_deg) % 360) / 2
             )  # Center of the house
@@ -258,7 +258,7 @@ class Chart(DotDict):
             A list of SVG elements representing vertex lines
         """
         vertex_radius = self.max_radius + self.margin // 2
-        house_radius = self.max_radius - 2 * self.ring_thickness
+        house_radius = self.max_radius - 1 * self.ring_thickness
         body_radius = self.max_radius - 3 * self.ring_thickness
 
         lines = [
@@ -271,14 +271,14 @@ class Chart(DotDict):
             self.background(
                 body_radius,
                 fill="#88888800",  # transparent
-                stroke=self.config.theme.dim,
+                stroke=self.config.theme.labels,
                 stroke_width=self.config.chart.stroke_width,
             ),
         ]
         for house in self.data1.houses:
             radius = house_radius
             stroke_width = self.config.chart.stroke_width
-            stroke_color = self.config.theme.dim
+            stroke_color = self.config.theme.labels
 
             angle = radians(house.normalized_degree)
             end_x = self.cx - radius * cos(angle)
@@ -306,7 +306,7 @@ class Chart(DotDict):
         """
         radius = self.max_radius - 3 * self.ring_thickness
         data = self.data2 or self.data1
-        return self.body_wheel(radius, data, self.config.chart.outer_min_degree)
+        return self.body_wheel(radius, data, self.config.chart.outer_min_degree,show_degree=True)
 
     def inner_body_wheel(self) -> list[str] | None:
         """Generate the inner body wheel for composite charts.
@@ -364,7 +364,7 @@ class Chart(DotDict):
                     y1=y,
                     x2=x_end,
                     y2=y,
-                    stroke=self.config.theme.dim,  # Faint color
+                    stroke=self.config.theme.horizon_color,  # Faint color
                     stroke_width=self.config.chart.stroke_width * 2,  # Wider line
                     stroke_opacity=0.25,  # Slightly transparent
                     stroke_dasharray="10,10",  # Long dashes (10 units dash, 10 units gap)
@@ -451,7 +451,7 @@ class Chart(DotDict):
 
         return avg_adj
 
-    def body_wheel(self, wheel_radius: float, data: Data, min_degree: float):
+    def body_wheel(self, wheel_radius: float, data: Data, min_degree: float, show_degree:bool = False):
         """Generate elements for both inner and outer body wheels.
 
         Args:
@@ -486,7 +486,7 @@ class Chart(DotDict):
                 "stroke_width": self.config.chart.stroke_width * 1.5,
             }
 
-            # special handling for asc, ic, dsc and mc
+            # Special handling for asc, ic, dsc and mc
             if body.name in VERTEX_NAMES:
                 g_opt["fill"] = self.config.theme.labels
                 g_opt["stroke"] = "none"
@@ -507,7 +507,22 @@ class Chart(DotDict):
             inner_radius = wheel_radius - self.ring_thickness
             inner_x = self.cx - inner_radius * cos(original_angle)
             inner_y = self.cy + inner_radius * sin(original_angle)
-            
+
+            # Degree label rotation
+            text_angle = adj_deg % 360
+            rotation_angle = (text_angle + 2*(90-text_angle)) % 360  # Further rotate by 180 degrees
+            if 90 < rotation_angle < 270:  # Flip text if on the bottom half of the circle
+                rotation_angle += 180
+
+            degree_label_x = self.cx - (symbol_radius + self.font_size) * cos(adjusted_angle)
+            degree_label_y = self.cy + (symbol_radius + self.font_size) * sin(adjusted_angle)
+
+            # Calculate background rectangle dimensions and position
+            rect_width = self.font_size * 2.5
+            rect_height = self.font_size * 1.2
+            rect_x = degree_label_x - rect_width / 2
+            rect_y = degree_label_y - rect_height / 2
+
             output.extend(
                 [
                     line(
@@ -522,7 +537,6 @@ class Chart(DotDict):
                         cx=symbol_x,
                         cy=symbol_y,
                         r=self.font_size / 2,
-                        # fill="red",  # for testing only
                         fill=self.config.theme.background,
                     ),
                     line(
@@ -530,7 +544,7 @@ class Chart(DotDict):
                         y1=degree_y,
                         x2=inner_x,
                         y2=inner_y,
-                        stroke=self.config.theme.dim,
+                        stroke=self.config.theme.labels,
                         stroke_width=self.config.chart.stroke_width / 2,
                         stroke_dasharray=self.ring_thickness / 11,
                     ),
@@ -538,10 +552,27 @@ class Chart(DotDict):
                         svg_paths[body.name],
                         transform=f"translate({symbol_x - self.pos_adjustment}, {symbol_y - self.pos_adjustment}) scale({self.scale_adjustment})",
                         **g_opt,
-                    ),
+                    )
                 ]
             )
+            if show_degree:
+                output.extend(
+                    [
+                        text(
+                            f"{body.degree % 30:.1f}°",
+                            x=degree_label_x,
+                            y=degree_label_y,
+                            fill=self.config.theme.labels,
+                            font_size=self.font_size * 0.4,
+                            text_anchor="middle",
+                            dominant_baseline="central",
+                            transform=f"rotate({rotation_angle}, {degree_label_x}, {degree_label_y})",
+                        ),
+                    ]
+                )
         return output
+
+
 
     def aspect_lines(self, radius: float, aspects: list[Aspect]) -> list[str]:
         """Draw aspect lines and inward spikes for the chart, with special handling for conjunctions.
@@ -558,7 +589,7 @@ class Chart(DotDict):
             self.background(
                 radius,
                 fill=self.config.theme.aspectBackground,
-                stroke=self.config.theme.dim,
+                stroke=self.config.theme.labels,
                 stroke_width=self.config.chart.stroke_width,
             )
         ]
