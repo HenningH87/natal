@@ -58,3 +58,44 @@ def str_to_dt(dt_str: str) -> datetime:
         datetime: Parsed datetime object
     """
     return datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
+
+def generate_alphabetical_sequence(n: int) -> list[str]:
+    """
+    Generate a sequence of alphabetical strings starting from 'A', 'B', ..., 'Z', 'AA', ..., up to n terms.
+
+    Args:
+        n (int): The number of terms to generate in the sequence.
+
+    Returns:
+        list[str]: The list of generated alphabetical strings.
+
+    # Example usage
+    n = 1000
+    sequence = generate_alphabetical_sequence(n)
+    print(sequence)
+    """
+    sequence = []
+    i = 0
+    while len(sequence) < n:
+        sequence.append(index_to_string(i))
+        i += 1
+    return sequence
+
+
+def index_to_string(index: int) -> str:
+    """
+    Convert a numerical index to its alphabetical string equivalent.
+
+    Args:
+        index (int): The numerical index to convert (0-based).
+
+    Returns:
+        str: The corresponding alphabetical string.
+    """
+    alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    base = len(alphabet)
+    result = []
+    while index >= 0:
+        result.append(alphabet[index % base])
+        index = index // base - 1
+    return ''.join(reversed(result))

@@ -91,14 +91,14 @@ class Theme(ModelDict):
     trine: str = "#009E73"
     conjunction: str = "#F0E442"
     other_aspects: str = "#a3a2a2"
-    houses: str = "#FFFFFF"
+    houses: str = "#fcfcf7"
     labels: str = "#000000" 
     sign_labels: str = "#000000"
     degree_labels: str = "#000000"
     transparency: float = 0
     foreground: str = "#758492" # The colors for the lines
     background: str = "#FFFFFF"
-    signWheel: str = "#FFFFFF"
+    signWheel: str = "#ffffdb"
     horizon_color: str = "#A4BACD"
     aspectBackground: str = "#FFFFFF"
 
